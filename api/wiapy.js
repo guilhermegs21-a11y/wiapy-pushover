@@ -10,7 +10,9 @@ export default async function handler(req, res) {
   if (p.status && p.status !== 'paid') return res.status(200).send('ignorado');
 
   const kit = PREMIUM.includes(body.checkout && body.checkout.id) ? 'Premium' : 'Básico';
-  const valor = 'R$ ' + (((p.amount || 0) - (p.fee || 0)) / 100).toFixed(2).replace('.', ',');
+  const liquido = ((p.amount || 0) - (p.fee || 0)) / 100;
+  const [int, dec] = liquido.toFixed(2).split('.');
+  const valor = 'R$ ' + int.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + dec;
   const metodo = p.payment_method === 'pix' ? 'Pix' : p.payment_method === 'credit_card' ? 'Cartão' : 'Boleto';
 
   const temBump = Array.isArray(body.checkout && body.checkout.orderbump) && body.checkout.orderbump.length > 0;
