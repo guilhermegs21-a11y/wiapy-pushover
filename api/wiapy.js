@@ -13,6 +13,9 @@ export default async function handler(req, res) {
   const valor = 'R$ ' + (((p.amount || 0) - (p.fee || 0)) / 100).toFixed(2).replace('.', ',');
   const metodo = p.payment_method === 'pix' ? 'Pix' : p.payment_method === 'credit_card' ? 'Cartão' : 'Boleto';
 
+  const temBump = Array.isArray(body.checkout && body.checkout.orderbump) && body.checkout.orderbump.length > 0;
+  const bump = temBump ? ' + Bump' : '';
+
   const r = await fetch('https://api.pushover.net/1/messages.json', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,7 +23,7 @@ export default async function handler(req, res) {
       token: process.env.PUSHOVER_TOKEN,
       user: process.env.PUSHOVER_USER,
       title: 'Venda aprovada!',
-      message: `Valor recebido ${valor} ${metodo} | ${kit}`,
+      message: `Valor recebido ${valor} ${metodo} | ${kit}${bump}`,
       sound: 'caixa',
     }),
   });
