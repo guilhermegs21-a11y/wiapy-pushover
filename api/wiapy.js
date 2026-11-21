@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   const kit = PREMIUM.includes(body.checkout && body.checkout.id) ? 'PREMIUM' : 'BÁSICO';
   const valor = 'R$ ' + (((p.amount || 0) - (p.fee || 0)) / 100).toFixed(2).replace('.', ',');
-  const metodo = p.payment_method === 'pix' ? 'Pix' : p.payment_method === 'credit_card' ? 'Cartão de crédito' : 'Boleto';
+  const metodo = p.payment_method === 'pix' ? 'Pix' : p.payment_method === 'credit_card' ? 'Cartão' : 'Boleto';
 
   const r = await fetch('https://api.pushover.net/1/messages.json', {
     method: 'POST',
