@@ -9,9 +9,9 @@ export default async function handler(req, res) {
   const p = body.payment || {};
   if (p.status && p.status !== 'paid') return res.status(200).send('ignorado');
 
-  const kit = PREMIUM.includes(body.checkout && body.checkout.id) ? 'KIT PREMIUM' : 'KIT BÁSICO';
+  const kit = PREMIUM.includes(body.checkout && body.checkout.id) ? 'PREMIUM' : 'BÁSICO';
   const valor = 'R$ ' + (((p.amount || 0) - (p.fee || 0)) / 100).toFixed(2).replace('.', ',');
-  const metodo = p.payment_method === 'pix' ? 'Pix' : p.payment_method === 'credit_card' ? 'Cartão' : 'Boleto';
+  const metodo = p.payment_method === 'pix' ? 'Pix' : p.payment_method === 'credit_card' ? 'Cartão de crédito' : 'Boleto';
 
   const r = await fetch('https://api.pushover.net/1/messages.json', {
     method: 'POST',
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       token: process.env.PUSHOVER_TOKEN,
       user: process.env.PUSHOVER_USER,
       title: 'Venda aprovada!',
-      message: `Valor recebido ${valor} · ${kit} · ${metodo}`,
+      message: `${kit} | Valor recebido ${valor} ${metodo}`,
       sound: 'cashregister',
     }),
   });
