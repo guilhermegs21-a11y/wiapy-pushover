@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   const p = body.payment || {};
   if (p.status && p.status !== 'paid') return res.status(200).send('ignorado');
 
-  const kit = PREMIUM.includes(body.checkout && body.checkout.id) ? 'Kit Premium' : 'Kit Básico';
+  const kit = PREMIUM.includes(body.checkout && body.checkout.id) ? 'KIT PREMIUM' : 'KIT BÁSICO';
   const valor = 'R$ ' + ((p.amount || 0) / 100).toFixed(2).replace('.', ',');
   const metodo = p.payment_method === 'pix' ? 'Pix' : p.payment_method === 'credit_card' ? 'Cartão' : 'Boleto';
 
