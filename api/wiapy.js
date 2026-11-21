@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       user: process.env.PUSHOVER_USER,
       title: 'Venda aprovada!',
       message: `Valor recebido ${valor} ${metodo} | ${kit}`,
-      sound: 'cashregister',
+      sound: 'caixa',
     }),
   });
   return res.status(r.ok ? 200 : 502).send(await r.text());
