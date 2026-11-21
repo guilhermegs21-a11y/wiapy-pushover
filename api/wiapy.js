@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       token: process.env.PUSHOVER_TOKEN,
       user: process.env.PUSHOVER_USER,
       title: 'Venda aprovada!',
-      message: `${kit} | Valor recebido ${valor} ${metodo}`,
+      message: `Valor recebido ${valor} ${metodo} | ${kit}`,
       sound: 'cashregister',
     }),
   });
