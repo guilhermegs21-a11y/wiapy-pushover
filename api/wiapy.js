@@ -20,7 +20,16 @@ export default async function handler(req, res) {
 
   // Venda vinda do TikTok (utm_source=tiktok ou ttclid em qualquer campo de origem)
   const { customer, ...semCliente } = body;
-  const tiktok = /tiktok|ttclid/i.test(JSON.stringify(semCliente));
+  // Só olha os VALORES preenchidos (não o nome dos campos), pra não marcar venda do Facebook por engano
+  let tiktok = false;
+  const varre = (o) => {
+    if (!o || typeof o !== 'object') return;
+    for (const [k, v] of Object.entries(o)) {
+      if (typeof v === 'string' && v && (/tiktok/i.test(v) || /ttclid/i.test(k))) tiktok = true;
+      else if (typeof v === 'object') varre(v);
+    }
+  };
+  varre(semCliente);
 
   const r = await fetch('https://api.pushover.net/1/messages.json', {
     method: 'POST',
