@@ -18,13 +18,17 @@ export default async function handler(req, res) {
   const temBump = Array.isArray(body.checkout && body.checkout.orderbump) && body.checkout.orderbump.length > 0;
   const bump = temBump ? ' + Bump' : '';
 
+  // Venda vinda do TikTok (utm_source=tiktok ou ttclid em qualquer campo de origem)
+  const { customer, ...semCliente } = body;
+  const tiktok = /tiktok|ttclid/i.test(JSON.stringify(semCliente));
+
   const r = await fetch('https://api.pushover.net/1/messages.json', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       token: process.env.PUSHOVER_TOKEN,
       user: process.env.PUSHOVER_USER,
-      title: 'Venda aprovada!',
+      title: tiktok ? 'TikTok | Venda aprovada!' : 'Venda aprovada!',
       message: `Valor recebido ${valor} ${metodo} | ${kit}${bump}`,
       sound: 'caixa',
     }),
