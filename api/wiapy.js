@@ -9,6 +9,17 @@ const AREA_MEMBROS = {
   '6b02360eba649e6c36d6e2ef': 'Pack +450 Moldes',
   '6b02360ef6f34fd109a6e4fd': 'Combo 4 Produtos',
 };
+// Produtos do Bordados (BordaPapel)
+const BORDADOS = {
+  '6b05e0d41def0eef30afbee0': 'Básico',
+  '6b05e0de520d49860edd4b29': 'Completo',
+  '6b05e0e33abee4176b359651': 'Completo',
+};
+const BORDADOS_AREA = {
+  '6b05e0e83abee4176b3596b3': 'Upgrade Completo',
+  '6b05e0ec520d49860edd4ca7': 'Kit Premium Calendários',
+  '6b05e0f13abee4176b3597fa': '12 Flores do Tempo',
+};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(200).send('ok');
@@ -19,8 +30,12 @@ export default async function handler(req, res) {
   if (p.status && p.status !== 'paid') return res.status(200).send('ignorado');
 
   const checkoutId = body.checkout && body.checkout.id;
-  const areaMembros = AREA_MEMBROS[checkoutId];
-  const kit = areaMembros || (PREMIUM.includes(checkoutId) ? 'Premium' : 'Básico');
+  const productId = body.product && body.product.id;
+  const bid = [checkoutId, productId].find((id) => id && (BORDADOS[id] || BORDADOS_AREA[id]));
+  const bordados = !!bid;
+  const areaMembros = bordados ? BORDADOS_AREA[bid] : AREA_MEMBROS[checkoutId];
+  const kit = areaMembros || (bordados ? BORDADOS[bid] : PREMIUM.includes(checkoutId) ? 'Premium' : 'Básico');
+  const produto = bordados ? 'Bordados' : 'Calendários';
   const liquido = ((p.amount || 0) - (p.fee || 0)) / 100;
   const [int, dec] = liquido.toFixed(2).split('.');
   const valor = 'R$ ' + int.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + dec;
@@ -48,7 +63,7 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       token: process.env.PUSHOVER_TOKEN,
       user: process.env.PUSHOVER_USER,
-      title: areaMembros ? 'Venda aprovada! | Área de membros' : tiktok ? 'TikTok | Venda aprovada!' : 'Venda aprovada!',
+      title: produto + ' | ' + (areaMembros ? 'Venda aprovada! | Área de membros' : tiktok ? 'TikTok | Venda aprovada!' : 'Venda aprovada!'),
       message: `Valor recebido ${valor} ${metodo} | ${kit}${bump}`,
       sound: 'caixa',
     }),
