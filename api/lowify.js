@@ -1,7 +1,6 @@
 // Recebe a venda paga da LOWIFY e manda notificação no Pushover (som de caixa registradora).
 // Arquivo novo e separado: o aviso da Wiapy (api/wiapy.js) continua igual.
 // Mesmo formato do aviso da Wiapy: "Calendários | Venda aprovada!" / "Bordados | Venda aprovada!".
-const TAXA_LOWIFY = 0.99; // por venda; a Lowify não manda o líquido
 
 const tira = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -44,8 +43,9 @@ export default async function handler(req, res) {
   // Order bump chega como item à parte: não toca de novo, a venda principal já avisou.
   if (c.bump || tipo.includes('bump')) return res.status(200).send('bump ignorado');
 
-  const bruto = Number(body.sale_amount ?? prod.price ?? 0) || 0;
-  const liquido = Math.max(0, bruto - TAXA_LOWIFY);
+  // sale_amount já é o que o produtor recebe: a taxa de R$ 0,99 da Lowify é
+  // cobrada da cliente, por cima do preço (9,90 pago = 8,91 + 0,99).
+  const liquido = Math.max(0, Number(body.sale_amount ?? prod.price ?? 0) || 0);
   const [int, dec] = liquido.toFixed(2).split('.');
   const valor = 'R$ ' + int.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + dec;
   const pm = tira(body.payment_method || (body.payment && body.payment.method));
