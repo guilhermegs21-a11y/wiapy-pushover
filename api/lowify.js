@@ -43,9 +43,9 @@ export default async function handler(req, res) {
   // Order bump chega como item à parte: não toca de novo, a venda principal já avisou.
   if (c.bump || tipo.includes('bump')) return res.status(200).send('bump ignorado');
 
-  // sale_amount já é o que o produtor recebe: a taxa de R$ 0,99 da Lowify é
-  // cobrada da cliente, por cima do preço (9,90 pago = 8,91 + 0,99).
-  const liquido = Math.max(0, Number(body.sale_amount ?? prod.price ?? 0) || 0);
+  // sale_amount = preço do produto. A Lowify desconta R$ 0,99 do produtor
+  // (além dos 0,99 cobrados da cliente) e R$ 0,40 do envio por WhatsApp.
+  const liquido = Math.max(0, (Number(body.sale_amount ?? prod.price ?? 0) || 0) - 0.99 - 0.4);
   const [int, dec] = liquido.toFixed(2).split('.');
   const valor = 'R$ ' + int.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + dec;
   const pm = tira(body.payment_method || (body.payment && body.payment.method));
